@@ -19,6 +19,17 @@ export class Thread {
         };
     }
 
+    serializeForUpdate() {
+        const t = {};
+        if (this.uid) t.uid = this.uid;
+        if (this.email) t.email = this.email;
+        if (this.title) t.title = this.title;
+        if (this.timestamp) t.timestamp = this.timestamp;
+        if (this.content) t.content = this.content;
+        if (this.keywordsArray) t.keywordsArray = this.keywordsArray;
+        return t;
+    }
+
     validate_title() {
         if (this.title && this.title.length > 2) return null;
         return 'invalid: min length should be 3';

@@ -1,6 +1,7 @@
 import * as Constant from '../model/constant.js'
 import { Reply } from '../model/reply.js';
 import { Thread } from '../model/thread.js';
+import * as ThreadPage from '../viewpage/thread_page.js';
 
 export async function signIn(email, password) {
     await firebase.auth().signInWithEmailAndPassword(email, password);
@@ -83,4 +84,31 @@ export async function searchThreads(keywordsArray) {
 
 export async function createAccount(email, password) {
     await firebase.auth().createUserWithEmailAndPassword(email, password);
+}
+
+const cf_deleteThread = firebase.functions().httpsCallable('cf_deleteThread');
+const cf_updateThread = firebase.functions().httpsCallable('cf_updateThread');
+export async function deleteThread(thread) {
+    const replyList = await getReplyList(thread);
+
+    await cf_deleteThread(thread, null, replyList);
+
+    if (replyList.length != 0) {
+        const uid = thread.uid;
+        const title = 'deleted';
+        const content = 'deleted';
+        const email = thread.email;
+        const timestamp = Date.now();
+        const keywordsArray = null;
+
+        const deletedThread = new Thread({
+            uid, title, content, email, timestamp, keywordsArray,
+        });
+
+        deletedThread.docId = docId;
+
+        await cf_updateThread(deletedThread, null);
+
+        await ThreadPage.updateOriginalThreadBody(deletedThread);
+    }
 }

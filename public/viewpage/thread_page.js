@@ -54,11 +54,16 @@ export async function thread_page(threadId) {
     }
 
     let html = `
+        <div id="original-thread">
+        </div>
+    `
+
+    /*let html = `
         <h4 class="bg-primary text-white">${thread.title}</h4>
         <div>${thread.email} (At ${new Date(thread.timestamp).toString()})</div>
         <div class="bg-secondary text-white">${thread.content}</div>
         <hr>
-    `;
+    `;*/
 
     html += '<div id="message-reply-body">'
     if (replies && replies.length > 0) {
@@ -77,6 +82,8 @@ export async function thread_page(threadId) {
     `;
 
     Element.root.innerHTML = html;
+
+    await updateOriginalThreadBody(thread);
 
     document.getElementById('button-add-new-reply').addEventListener('click', async () => {
         const content = document.getElementById('textarea-add-new-reply').value;
@@ -117,4 +124,13 @@ function buildReplyView(reply) {
         </div>
         <hr>
     `;
+}
+
+export async function updateOriginalThreadBody(thread) {
+    document.getElementById("original-thread").innerHTML = `
+    <h4 class="bg-primary text-white">${thread.title}</h4>
+        <div>${thread.email} (At ${new Date(thread.timestamp).toString()})</div>
+        <div class="bg-secondary text-white">${thread.content}</div>
+        <!--<hr>-->
+    `
 }
