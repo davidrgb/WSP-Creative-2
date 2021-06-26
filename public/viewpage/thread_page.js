@@ -149,6 +149,10 @@ export async function thread_page(threadId) {
         })
     }
 
+    for (const reply of replies) {
+        addDeleteReplyListener(reply);
+    }
+
     document.getElementById('button-add-new-reply').addEventListener('click', async () => {
         const content = document.getElementById('textarea-add-new-reply').value;
         const uid = Auth.currentUser.uid;
@@ -175,19 +179,31 @@ export async function thread_page(threadId) {
         document.getElementById('textarea-add-new-reply').value = ''
 
         Util.enableButton(button, label)
+
+        await addDeleteReplyListener(reply);
     });
 }
 
 function buildReplyView(reply) {
-    return `
-        <div class="border border-primary">
+    let html = `
+        <div id="reply-${reply.uid}-${reply.timestamp}" class="border border-primary">
             <div class="bg-info text-white">
                 Replied by ${reply.email} (At ${new Date(reply.timestamp).toString()})
             </div>
             ${reply.content}
         </div>
-        <hr>
-    `;
+        <!--<hr>-->
+    `
+    if (Auth.currentUser.uid == reply.uid) {
+        html += `
+        <div id="buttons-${reply.uid}-${reply.timestamp}">
+            <!--<button id="button-edit-reply-${reply.uid}-${reply.timestamp}" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal-edit-reply" style="margin-top: 10px">Edit</button>-->
+            <button id="button-delete-reply-${reply.uid}-${reply.timestamp}" class="btn btn-outline-danger" style="margin-top: 10px">Delete</button>
+        </div>
+        `
+    }
+    html += "<hr>"
+    return html;
 }
 
 export async function updateOriginalThreadBody(thread) {
@@ -197,4 +213,12 @@ export async function updateOriginalThreadBody(thread) {
         <div class="bg-secondary text-white">${thread.content}</div>
         <!--<hr>-->
     `
+}
+
+async function addDeleteReplyListener(reply) {
+    if (Auth.currentUser.uid == reply.uid) {
+        document.getElementById(`button-delete-reply-${reply.uid}-${reply.timestamp}`).addEventListener('click', async () => {
+            await FirebaseController.deleteReply(reply);
+        })
+    }
 }

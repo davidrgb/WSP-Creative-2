@@ -16,4 +16,14 @@ export class Reply {
             content: this.content,
         }
     }
+
+    serializeForUpdate() {
+        const r = {};
+        if (this.threadId) r.threadId = this.threadId
+        if (this.uid) r.uid = this.uid;
+        if (this.email) r.email = this.email;
+        if (this.timestamp) r.timestamp = this.timestamp;
+        if (this.content) r.content = this.content;
+        return r;
+    }
 }

@@ -125,3 +125,10 @@ export async function updateThread(thread, threadUpdate) {
 
     await cf_updateThread({docId, data});
 }
+
+const cf_deleteReply = firebase.functions().httpsCallable('cf_deleteReply');
+export async function deleteReply(reply) {
+    cf_deleteReply(reply.docId);
+    document.getElementById(`reply-${reply.uid}-${reply.timestamp}`).innerHTML = 'This reply has been deleted.';
+    document.getElementById(`buttons-${reply.uid}-${reply.timestamp}`).innerHTML = '';
+}

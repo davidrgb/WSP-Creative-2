@@ -12,6 +12,7 @@ const Constant = require('./constant.js')
 
 exports.cf_deleteThread = functions.https.onCall(deleteThread);
 exports.cf_updateThread = functions.https.onCall(updateThread);
+exports.cf_deleteReply = functions.https.onCall(deleteReply);
 
 async function deleteThread(docId, context) {
     try {
@@ -36,5 +37,18 @@ async function updateThread(info, context) {
     catch (e) {
         if (Constant.DEV) console.log(e);
         throw new functions.https.HttpsError('internal', 'updateThread failed');
+    }
+}
+
+async function deleteReply(docId, context) {
+    try {
+        await admin.firestore().collection(Constant.collectionNames.REPLIES)
+                .doc(docId)
+                .delete();
+        return;
+    }
+    catch (e) {
+        if (Constant.DEV) console.log(e);
+        throw new functions.https.HttpsError('internal', 'deleteReply failed');
     }
 }
