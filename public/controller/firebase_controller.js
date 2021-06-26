@@ -89,11 +89,11 @@ export async function createAccount(email, password) {
 const cf_deleteThread = firebase.functions().httpsCallable('cf_deleteThread');
 const cf_updateThread = firebase.functions().httpsCallable('cf_updateThread');
 export async function deleteThread(thread) {
-    const replyList = await getReplyList(thread);
+    const replyList = await getReplyList(thread.docId);
 
-    await cf_deleteThread(thread, null, replyList);
+    if (replyList.length == 0) await cf_deleteThread(thread.docId);
 
-    if (replyList.length != 0) {
+    else {
         const uid = thread.uid;
         const title = 'deleted';
         const content = 'deleted';
@@ -105,9 +105,12 @@ export async function deleteThread(thread) {
             uid, title, content, email, timestamp, keywordsArray,
         });
 
-        deletedThread.docId = docId;
+        //deletedThread.docId = docId;
 
-        await cf_updateThread(deletedThread, null);
+        const docId = thread.docId;
+        const data = deletedThread.serializeForUpdate();
+
+        await cf_updateThread(({docId, data}));
 
         await ThreadPage.updateOriginalThreadBody(deletedThread);
     }

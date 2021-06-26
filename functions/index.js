@@ -14,15 +14,13 @@ const Constant = require('./constant.js')
 exports.cf_deleteThread = functions.https.onCall(deleteThread);
 exports.cf_updateThread = functions.https.onCall(updateThread);
 
-async function deleteThread(docId, context, replyList) {
+async function deleteThread(docId, context) {
     try {
-        if (replyList.length == 0) {
-            await firebase.firestore()
-                    .collection(Constant.collectionNames.THREADS)
-                    .doc(docId)
-                    .delete();
-            return null;
-        }
+        await admin.firestore()
+                .collection(Constant.collectionNames.THREADS)
+                .doc(docId)
+                .delete();
+        return;
 
         /*const uid = thread.uid;
         const title = 'deleted';
@@ -48,10 +46,10 @@ async function deleteThread(docId, context, replyList) {
 
 }
 
-async function updateThread(threadUpdate, context) {
+async function updateThread(info, context) {
     try {
-        await firebase.firestore().collection(Constant.collectionNames.THREADS)
-                .doc(threadUpdate.docId).update(threadUpdate.data);
+        await admin.firestore().collection(Constant.collectionNames.THREADS)
+                .doc(info.docId).update(info.data);
     }
     catch (e) {
         if (Constant.DEV) console.log(e);

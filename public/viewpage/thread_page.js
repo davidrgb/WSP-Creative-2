@@ -65,6 +65,13 @@ export async function thread_page(threadId) {
         <hr>
     `;*/
 
+    if (Auth.currentUser.uid == thread.uid) {
+        html += `
+        <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal-edit-thread" style="margin-top: 10px">Edit</button>
+        <button id="button-delete-thread" class="btn btn-outline-danger" style="margin-top: 10px">Delete</button>
+        `
+    }
+
     html += '<div id="message-reply-body">'
     if (replies && replies.length > 0) {
         replies.forEach(r => {
@@ -84,6 +91,12 @@ export async function thread_page(threadId) {
     Element.root.innerHTML = html;
 
     await updateOriginalThreadBody(thread);
+
+    if (Auth.currentUser.uid == thread.uid) {
+        document.getElementById('button-delete-thread').addEventListener('click', async () => {
+            await FirebaseController.deleteThread(thread)
+        })
+    }
 
     document.getElementById('button-add-new-reply').addEventListener('click', async () => {
         const content = document.getElementById('textarea-add-new-reply').value;
