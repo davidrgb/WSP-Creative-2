@@ -5,6 +5,7 @@ import * as Util from './util.js'
 import * as Constant from '../model/constant.js'
 import {Reply} from '../model/reply.js'
 import * as Route from '../controller/route.js'
+import { Thread } from '../model/thread.js'
 
 export function addViewButtonListeners() {
     const viewButtonForms = document.getElementsByClassName("thread-view-form");
@@ -86,6 +87,63 @@ export async function thread_page(threadId) {
     await updateOriginalThreadBody(thread);
 
     if (Auth.currentUser.uid == thread.uid) {
+        let editThread;
+        Element.formEditThread.addEventListener('submit', async e => {
+            e.preventDefault();
+    
+            const button = Element.formEditThread.getElementsByTagName ('button')[0];
+            const label = Util.disableButton(button);
+    
+            Element.formEditThreadError.title.innerHTML = '';
+            Element.formEditThreadError.keywords.innerHTML = '';
+            Element.formEditThreadError.content.innerHTML = '';
+    
+            const title = e.target.title.value.trim();
+            const content = e.target.content.value;
+            const keywords = e.target.keywords.value;
+            const uid = thread.uid;
+            const email = thread.email;
+            const timestamp = Date.now();
+            const keywordsArray = keywords.toLowerCase().match(/\S+/g);
+            editThread = new Thread({
+                uid, title, content, email, timestamp, keywordsArray, 
+            });
+
+            let valid = true;
+            let error = editThread.validate_title();
+            if (error) {
+                valid = false;
+                Element.formEditThreadError.title.innerHTML = error;
+            }
+            error = editThread.validate_keywords();
+            if (error) {
+                valid = false;
+                Element.formEditThreadError.keywords.innerHTML = error;
+            }
+            error = editThread.validate_content();
+            if (error) {
+                valid = false;
+                Element.formEditThreadError.content.innerHTML = error;
+            }
+
+            if (!valid) {
+                Util.enableButton(button, label);
+                return;
+            }
+
+            try {
+                await FirebaseController.updateThread(thread, editThread);
+                await updateOriginalThreadBody(editThread);
+                e.target.reset();
+    
+                Util.info('Success', 'Thread has been edited', Element.modalEditThread);
+            } catch (e) {
+                if (Constant.DEV) console.log(e);
+                Util.info('Failed to edit', JSON.stringify(e), Element.modalCreateThread);
+            }
+            Util.enableButton(button, label)
+        })
+
         document.getElementById('button-delete-thread').addEventListener('click', async () => {
             await FirebaseController.deleteThread(thread)
         })

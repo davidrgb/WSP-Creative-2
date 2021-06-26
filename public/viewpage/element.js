@@ -18,6 +18,12 @@ export const formCreateAccountError = {
     password: document.getElementById('create-account-error-password'),
     passwordConfirm: document.getElementById('create-account-error-passwordConfirm'),
 }
+export const formEditThread = document.getElementById('form-edit-thread');
+export const formEditThreadError = {
+    title: document.getElementById('form-edit-thread-error-title'),
+    keywords: document.getElementById('form-edit-thread-error-keywords'),
+    content: document.getElementById('form-edit-thread-error-content'),
+}
 
 // main content root
 export const root = document.getElementById('root');
@@ -30,3 +36,4 @@ export const modalInfoboxBodyElement = document.getElementById('modal-infobox-bo
 export const modalCreateAccount = new bootstrap.Modal(document.getElementById('modal-create-account'), {backdrop: 'static'});
 
 export const modalCreateThread = new bootstrap.Modal(document.getElementById('modal-create-thread'), {backdrop: 'static'});
+export const modalEditThread = new bootstrap.Modal(document.getElementById('modal-edit-thread'), {backdrop: 'static'});

@@ -119,6 +119,9 @@ export async function deleteThread(thread) {
     }
 }
 
-export async function updateThread(thread) {
-    await cf_updateThread()
+export async function updateThread(thread, threadUpdate) {
+    const docId = thread.docId;
+    const data = threadUpdate.serializeForUpdate();
+
+    await cf_updateThread({docId, data});
 }
