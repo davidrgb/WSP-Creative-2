@@ -9,7 +9,6 @@ admin.initializeApp({
 });
 
 const Constant = require('./constant.js')
-//const Thread = require('../public/model/thread.js')
 
 exports.cf_deleteThread = functions.https.onCall(deleteThread);
 exports.cf_updateThread = functions.https.onCall(updateThread);
@@ -21,23 +20,6 @@ async function deleteThread(docId, context) {
                 .doc(docId)
                 .delete();
         return;
-
-        /*const uid = thread.uid;
-        const title = 'deleted';
-        const content = 'deleted';
-        const email = thread.email;
-        const timestamp = Date.now();
-        const keywordsArray = null;
-
-        const deletedThread = new Thread({
-            uid, title, content, email, timestamp, keywordsArray,
-        });
-
-        deletedThread.docId = docId;
-
-        await updateThread(deletedThread, null);
-
-        return deletedThread;*/
     }
     catch (e) {
         if (Constant.DEV) console.log(e);

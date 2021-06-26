@@ -105,8 +105,6 @@ export async function deleteThread(thread) {
             uid, title, content, email, timestamp, keywordsArray,
         });
 
-        //deletedThread.docId = docId;
-
         const docId = thread.docId;
         const data = deletedThread.serializeForUpdate();
 

@@ -58,13 +58,6 @@ export async function thread_page(threadId) {
         </div>
     `
 
-    /*let html = `
-        <h4 class="bg-primary text-white">${thread.title}</h4>
-        <div>${thread.email} (At ${new Date(thread.timestamp).toString()})</div>
-        <div class="bg-secondary text-white">${thread.content}</div>
-        <hr>
-    `;*/
-
     if (Auth.currentUser.uid == thread.uid) {
         html += `
         <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal-edit-thread" style="margin-top: 10px">Edit</button>
