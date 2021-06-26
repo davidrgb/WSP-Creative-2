@@ -1,6 +1,7 @@
 import * as Constant from '../model/constant.js'
 import { Reply } from '../model/reply.js';
 import { Thread } from '../model/thread.js';
+import * as Element from '../viewpage/element.js'
 import * as ThreadPage from '../viewpage/thread_page.js';
 
 export async function signIn(email, password) {
@@ -91,13 +92,17 @@ const cf_updateThread = firebase.functions().httpsCallable('cf_updateThread');
 export async function deleteThread(thread) {
     const replyList = await getReplyList(thread.docId);
 
-    if (replyList.length == 0) await cf_deleteThread(thread.docId);
+    if (replyList.length == 0) {
+        await cf_deleteThread(thread.docId);
+        Element.root.innerHTML = "Thread has been deleted."
+        return;
+    }
 
     else {
-        const uid = thread.uid;
+        const uid = null;
         const title = 'deleted';
         const content = 'deleted';
-        const email = thread.email;
+        const email = null;
         const timestamp = Date.now();
         const keywordsArray = null;
 
@@ -112,4 +117,8 @@ export async function deleteThread(thread) {
 
         await ThreadPage.updateOriginalThreadBody(deletedThread);
     }
+}
+
+export async function updateThread(thread) {
+    await cf_updateThread()
 }
