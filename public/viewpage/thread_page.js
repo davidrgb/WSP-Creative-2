@@ -7,6 +7,8 @@ import {Reply} from '../model/reply.js'
 import * as Route from '../controller/route.js'
 import { Thread } from '../model/thread.js'
 
+let isAdmin;
+
 export function addViewButtonListeners() {
     const viewButtonForms = document.getElementsByClassName("thread-view-form");
     for (let i = 0; i < viewButtonForms.length; i++) {
@@ -59,12 +61,17 @@ export async function thread_page(threadId) {
         </div>
     `
 
-    if (Auth.currentUser.uid == thread.uid) {
+    const cf_isAdmin = firebase.functions().httpsCallable('cf_isAdmin');
+    isAdmin = await cf_isAdmin(Auth.currentUser.email);
+
+    if (Auth.currentUser.uid == thread.uid || isAdmin.data) {
         html += `
         <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal-edit-thread" style="margin-top: 10px">Edit</button>
         <button id="button-delete-thread" class="btn btn-outline-danger" style="margin-top: 10px">Delete</button>
         `
     }
+
+    html += '<hr>'
 
     html += '<div id="message-reply-body">'
     if (replies && replies.length > 0) {
@@ -86,7 +93,7 @@ export async function thread_page(threadId) {
 
     await updateOriginalThreadBody(thread);
 
-    if (Auth.currentUser.uid == thread.uid) {
+    if (Auth.currentUser.uid == thread.uid || isAdmin.data) {
         let editThread;
         Element.formEditThread.addEventListener('submit', async e => {
             e.preventDefault();
@@ -194,7 +201,7 @@ function buildReplyView(reply) {
         </div>
         <!--<hr>-->
     `
-    if (Auth.currentUser.uid == reply.uid) {
+    if (Auth.currentUser.uid == reply.uid || isAdmin.data) {
         html += `
         <div id="buttons-${reply.uid}-${reply.timestamp}">
             <!--<button id="button-edit-reply-${reply.uid}-${reply.timestamp}" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal-edit-reply" style="margin-top: 10px">Edit</button>-->
@@ -216,7 +223,7 @@ export async function updateOriginalThreadBody(thread) {
 }
 
 async function addDeleteReplyListener(reply) {
-    if (Auth.currentUser.uid == reply.uid) {
+    if (Auth.currentUser.uid == reply.uid || isAdmin.data) {
         document.getElementById(`button-delete-reply-${reply.uid}-${reply.timestamp}`).addEventListener('click', async () => {
             await FirebaseController.deleteReply(reply);
         })

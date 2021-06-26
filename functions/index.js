@@ -13,6 +13,11 @@ const Constant = require('./constant.js')
 exports.cf_deleteThread = functions.https.onCall(deleteThread);
 exports.cf_updateThread = functions.https.onCall(updateThread);
 exports.cf_deleteReply = functions.https.onCall(deleteReply);
+exports.cf_isAdmin = functions.https.onCall(isAdmin);
+
+async function isAdmin(email) {
+    return Constant.adminEmails.includes(email);
+}
 
 async function deleteThread(docId, context) {
     try {
